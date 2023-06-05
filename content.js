@@ -27,12 +27,10 @@ chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
   if (msg.from === "popup" && msg.subject === "setLoadScript") {
     console.log("setLoadScript");
     try {
-      // const res = await chrome.storage.local.set({ [`scriptInfo-${location.href}`]: JSON.stringify(msg.loadScript) }, x => console.log("callback: ", x))
       chrome.storage.local.set(
         { [`scriptInfo-${location.href}`]: JSON.stringify(msg.loadScript) },
         (x) => console.log("callback: ", x)
       );
-      // console.log(res)
       eval(msg.loadScript);
       response({ message: "success" });
     } catch (error) {
