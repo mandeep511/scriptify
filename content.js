@@ -21,7 +21,6 @@
   }
 })();
 
-
 chrome.runtime.onMessage.addListener(async (msg, sender, response) => {
   console.log(msg, sender, response);
   // First, validate the message's structure.
