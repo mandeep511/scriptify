@@ -1,7 +1,7 @@
-const sendToContentScript = async (tabs, scriptInputValue) => {
+const sendToContentScript = async (tabId, scriptInputValue) => {
   return new Promise((resolve, reject) => {
     chrome.tabs.sendMessage(
-      tabs[0].id,
+      tabId,
       {
         from: "popup",
         subject: "setLoadScript",
@@ -18,12 +18,12 @@ const sendToContentScript = async (tabs, scriptInputValue) => {
 };
 
 const applyAndSaveScript = async (tabs) => {
+  console.log(tabs);
   const scriptInputValue = document.querySelector("#scriptInput").value;
   try {
-    await sendToContentScript(tabs, scriptInputValue);
-    localStorage.setItem(`scriptInfo-${tabs[0].url}`, JSON.stringify(scriptInputValue));
+    await sendToContentScript(tabs[0].id, scriptInputValue);
   } catch (error) {
-    console.error("Error executing loadScript:", res.error);
+    console.error("Error executing loadScript:", error);
   }
 };
 
@@ -37,4 +37,16 @@ document.getElementById("saveScripts").addEventListener("click", async () => {
   chrome.tabs.query({ active: true, currentWindow: true }, applyAndSaveScript);
 });
 
-// document.getElementById("clearScripts").addEventListener("click", () => {
+window.addEventListener("DOMContentLoaded", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.storage.local.get([`scriptInfo-${tabs[0].url}`], (script) => {
+      console.log("afterLoadScript:", script);
+      const parsedscript = JSON.parse(Object.values(script));
+      console.log("ParsedScript: ", parsedscript);
+      if (script) {
+        document.querySelector("#scriptInput").value = parsedscript;
+      }
+    });
+  });
+});
+
